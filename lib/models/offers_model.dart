@@ -3,7 +3,6 @@ class Offers {
   String? kind;
   String? username;
   String? email;
-
   String? status;
   String? type;
   String? image;

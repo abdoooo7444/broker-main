@@ -133,11 +133,11 @@ class _HomePageState extends State<ShowRequest> {
                                           ),
                                         ),
                                         Text(
-                                          ' number :  ${requests[index].phoneNumber} ',
+                                          ' phoneNumber :  ${requests[index].propertyStatus} ',
                                           style: const TextStyle(fontSize: 13),
                                         ),
                                         Text(
-                                          'Details : ${requests[index].propertyDetails}',
+                                          'propertyDetails : ${requests[index].rentDuration}',
                                           style: const TextStyle(fontSize: 13),
                                         ),
                                         const Text(

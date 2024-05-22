@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:abdo/models/properties.dart';
 import 'package:dio/dio.dart';
+import 'package:path/path.dart';
 
 class ApiServices {
   late Dio dio;
@@ -7,7 +10,7 @@ class ApiServices {
   ApiServices() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "http://192.168.1.8:4000",
+        baseUrl: "http://10.0.2.2:4000",
       ),
     );
   }
@@ -52,10 +55,18 @@ class ApiServices {
     }
   }
 
-  Future<Property?> addNewResdential(Property property) async {
+  Future<Property?> addNewResdential(Property property, File imageFile) async {
     try {
+      FormData formData = FormData.fromMap({
+        ...property.toJson(),
+        'photo': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: basename(imageFile.path),
+        ),
+      });
+      print(formData.fields);
       final Response<Map<String, dynamic>> response =
-          await dio.post('/api/properties/Res', data: property.toJson());
+          await dio.post('/api/properties/Res', data: formData);
 
       if (response.data != null) {
         return Property.fromJson(response.data!);

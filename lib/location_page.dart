@@ -1,4 +1,6 @@
 // import 'package:abdo/commercial_page.dart';
+import 'dart:io';
+
 import 'package:abdo/commercial_page.dart';
 import 'package:abdo/home_page.dart';
 import 'package:abdo/models/properties.dart';
@@ -9,6 +11,7 @@ import 'package:abdo/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 //import 'package:image_picker/image_picker.dart';
 // import 'package:path/path.dart';
 
@@ -53,24 +56,24 @@ class _MyWidgetState extends State<LOcationPage> {
     }
   }
 
-  Future<void> getcurrentlocation() async {
-    isloading = true;
-    setState(() {});
-    currentposition = await Geolocator.getCurrentPosition().then((value) {
-      markers.add(
-        Marker(
-          markerId: const MarkerId('1'),
-          position: loc = LatLng(value.latitude, value.longitude),
-        ),
-      );
-      latitude = loc!.latitude;
-      longitude = loc!.longitude;
-      return null;
-    });
+  // Future<void> getcurrentlocation() async {
+  //   isloading = true;
+  //   setState(() {});
+  //   currentposition = await Geolocator.getCurrentPosition().then((value) {
+  //     markers.add(
+  //       Marker(
+  //         markerId: const MarkerId('1'),
+  //         position: loc = LatLng(value.latitude, value.longitude),
+  //       ),
+  //     );
+  //     latitude = loc!.latitude;
+  //     longitude = loc!.longitude;
+  //     return null;
+  //   });
 
-    isloading = false;
-    setState(() {});
-  }
+  //   isloading = false;
+  //   setState(() {});
+  // }
 
 /////////////////////////////////////////////end of methods ///////////////
   List<Marker> markers = [];
@@ -78,7 +81,7 @@ class _MyWidgetState extends State<LOcationPage> {
   Future<Position>? currentposition;
   double? latitude;
   double? longitude;
-  String? imgUrl;
+  late File imgUrl;
   bool isUploded = false;
   GoogleMapController? controllerMap;
   CameraPosition currentCamera =
@@ -120,37 +123,39 @@ class _MyWidgetState extends State<LOcationPage> {
                       child: Column(
                         children: [
                           MaterialButton(
-                            onPressed: imgUrl != null
-                                ? () {
-                                    // Handle button click when image is loaded
-                                  }
-                                : null,
-                            child: FutureBuilder(
-                              future: Images().getImageUrl(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator(); // Show loading indicator while waiting for the image
-                                } else if (snapshot.hasError) {
-                                  return const Text(
-                                    'Error loading image',
-                                  ); // Show an error message if image loading fails
-                                } else {
-                                  imgUrl = snapshot.data;
-                                  isUploded = imgUrl != null;
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 15),
-                                    height: 130,
-                                    width: 250,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage('$imgUrl'),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
+                            color: Colors.green,
+                            onPressed: () async {
+                              print('pressed');
+                              print('pressed');
+                              imgUrl = await Images().getImageUrl() ??
+                                  File("nopath");
+                              // FutureBuilder<File>(
+                              //   future: Images().getImageUrl(),
+                              //   builder: (context, snapshot) {
+                              //     if (snapshot.connectionState ==
+                              //         ConnectionState.waiting) {
+                              //       return const CircularProgressIndicator(); // Show loading indicator while waiting for the image
+                              //     } else if (snapshot.hasError) {
+                              //       return const Text(
+                              //         'Error loading image',
+                              //       ); // Show an error message if image loading fails
+                              //     } else {
+                              //       imgUrl = snapshot.data ?? File('path');
+                              //       isUploded = imgUrl != null;
+                              //       return Container(
+                              //         margin: const EdgeInsets.only(bottom: 15),
+                              //         height: 130,
+                              //         width: 250,
+                              //         decoration: BoxDecoration(
+                              //           image: DecorationImage(
+                              //             image: NetworkImage('$imgUrl'),
+                              //           ),
+                              //         ),
+                              //       );
+                              //     }
+                              //   },
+                              // );
+                            },
                           ),
                           const SizedBox(
                             height: 23,
@@ -213,7 +218,7 @@ class _MyWidgetState extends State<LOcationPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      getcurrentlocation();
+                      // getcurrentlocation();
                     },
                     child: const Row(
                       children: [
@@ -245,13 +250,12 @@ class _MyWidgetState extends State<LOcationPage> {
                             phoneNmber: int.parse(phoneRController.text),
                             moreDetails: detailsRController.text,
                             rentDuration: rentRduration,
-                            image: imgUrl,
                             latitude: latitude,
                             longitude: longitude,
                           );
 
-                          final addedProperty =
-                              await apiServices.addNewResdential(property);
+                          final addedProperty = await apiServices
+                              .addNewResdential(property, imgUrl);
                         } else {
                           property = Property(
                             type: typeC,
@@ -261,7 +265,6 @@ class _MyWidgetState extends State<LOcationPage> {
                             phoneNmber: int.parse(phoneCController.text),
                             moreDetails: detailsCController.text,
                             rentDuration: rentDurationC,
-                            image: imgUrl,
                             latitude: latitude,
                             longitude: longitude,
                           );
